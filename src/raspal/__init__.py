@@ -1,4 +1,17 @@
 from raspal.cache import Cache
+from raspal.exceptions import (
+    CacheError,
+    ConfigError,
+    ConnectionError,
+    ExtractError,
+    FetchError,
+    HTTPError,
+    LLMError,
+    ProxyError,
+    QueueError,
+    RaspalError,
+    TimeoutError,
+)
 from raspal.extractor import Extractor
 from raspal.fetcher import Fetcher
 from raspal.llm import LLMExtractor
@@ -18,4 +31,16 @@ __all__ = [
     "QueueItem",
     "Pipeline",
     "Item",
+    # Exceptions
+    "RaspalError",
+    "FetchError",
+    "TimeoutError",
+    "HTTPError",
+    "ConnectionError",
+    "ProxyError",
+    "ExtractError",
+    "LLMError",
+    "CacheError",
+    "QueueError",
+    "ConfigError",
 ]

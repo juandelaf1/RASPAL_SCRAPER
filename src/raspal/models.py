@@ -12,6 +12,7 @@ class FetchResult(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
     engine: str = "scrapling"
     cached: bool = False
+    error: str | None = None
     fetched_at: datetime = Field(default_factory=datetime.now)
 
 
@@ -29,6 +30,7 @@ class LLMConfig(BaseModel):
     template: str = ""
     temperature: float = 0.0
     strict: bool = False
+    timeout: int = 60
 
 
 class ChainStep(BaseModel):
@@ -47,10 +49,18 @@ class ThrottleConfig(BaseModel):
     target_avg: float = 1.0
 
 
+class ProxyConfig(BaseModel):
+    http: str = ""
+    https: str = ""
+    rotate: bool = False
+
+
 class PipelineConfig(BaseModel):
     url: str
     engine: str = "auto"
     cache_ttl: int = 3600
+    timeout: int = 30
+    proxy: ProxyConfig | None = None
     extract: ExtractionConfig = Field(default_factory=lambda: ExtractionConfig())
     llm: LLMConfig | None = None
     llm_chain: list[ChainStep] | None = None

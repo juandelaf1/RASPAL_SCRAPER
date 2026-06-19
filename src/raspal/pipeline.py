@@ -2,6 +2,7 @@ import csv
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import Self
 
 from pydantic import BaseModel, Field
 
@@ -40,3 +41,9 @@ class Pipeline:
 
     def __len__(self):
         return len(self.items)
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *args):
+        self.items.clear()

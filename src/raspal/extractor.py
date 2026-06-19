@@ -18,20 +18,20 @@ class Extractor:
         }
 
     def extract_selectors(self, html: str, selectors: dict[str, str]) -> dict[str, str | None]:
-        from scrapling import HtmlParser
+        from scrapling import Selector
 
-        parser = HtmlParser(html)
+        parser = Selector(html)
         result = {}
         for name, selector in selectors.items():
-            el = parser.css(selector)
-            result[name] = el.text if el else None
+            els = parser.css(selector)
+            result[name] = str(els[0].text) if els else None
         return result
 
     def extract_selectors_fast(self, html: str, selectors: dict[str, str]) -> dict[str, str | None]:
         try:
-            from selectolax.parser import HTMLParser
+            from selectolax.parser import HTMLParser as SelectolaxParser
 
-            parser = HTMLParser(html)
+            parser = SelectolaxParser(html)
             result = {}
             for name, selector in selectors.items():
                 node = parser.css_first(selector)

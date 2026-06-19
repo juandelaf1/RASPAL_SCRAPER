@@ -2,21 +2,22 @@ import json
 import re
 from typing import Any
 
+from raspal.exceptions import LLMError
 from raspal.models import ChainStep, LLMConfig
 
 
 class LLMExtractor:
     PROMPT_TEMPLATES = {
         "product": "Extract product info: name, brand, price, currency, "
-                    "description, availability, specifications.",
+        "description, availability, specifications.",
         "article": "Extract article info: title, author, date, "
-                    "summary, and key points.",
+        "summary, and key points.",
         "person": "Extract person info: name, role, organization, "
-                    "location, and contact details.",
+        "location, and contact details.",
         "review": "Extract review info: rating, reviewer, date, "
-                    "pros, cons, and overall sentiment.",
+        "pros, cons, and overall sentiment.",
         "event": "Extract event info: name, date, location, "
-                    "organizer, and description.",
+        "organizer, and description.",
         "generic": "Extract structured information from the following text.",
     }
 
@@ -27,7 +28,9 @@ class LLMExtractor:
         cfg = config or self.config
         return self._execute(text, cfg)
 
-    def extract_batch(self, texts: list[str], config: LLMConfig | None = None) -> list[dict]:
+    def extract_batch(
+        self, texts: list[str], config: LLMConfig | None = None
+    ) -> list[dict]:
         cfg = config or self.config
         return [self._execute(t, cfg) for t in texts]
 
@@ -42,7 +45,11 @@ class LLMExtractor:
                 template=step.template,
                 temperature=step.temperature,
             )
-            step_result = self._execute(current, cfg)
+            try:
+                step_result = self._execute(current, cfg)
+            except LLMError as e:
+                result[step.name] = {"error": str(e)}
+                break
             result[step.name] = step_result
             if step.output_key and step_result.get("raw") is None:
                 current = json.dumps(step_result)
@@ -50,7 +57,10 @@ class LLMExtractor:
 
     def _execute(self, text: str, cfg: LLMConfig) -> dict:
         prompt = self._build_prompt(text, cfg)
-        response = self._ollama_chat(cfg.model, prompt, cfg.temperature)
+        try:
+            response = self._ollama_chat(cfg.model, prompt, cfg.temperature, cfg.timeout)
+        except Exception as e:
+            raise LLMError(f"Ollama call failed: {e}") from e
         return self._parse_response(response, cfg.output_schema, cfg.strict)
 
     def _build_prompt(self, text: str, cfg: LLMConfig) -> str:
@@ -59,22 +69,23 @@ class LLMExtractor:
             template_name, self.PROMPT_TEMPLATES["generic"]
         )
 
-        schema_instruction = ""
+        parts = [base]
         if cfg.output_schema:
             schema_str = json.dumps(cfg.output_schema, indent=2)
-            schema_instruction = (
+            parts.append(
                 f"\n\nReturn ONLY a valid JSON object matching this schema:\n{schema_str}"
             )
-
-        strict_instruction = ""
         if cfg.strict:
-            strict_instruction = (
+            parts.append(
                 "\n\nRespond with ONLY the JSON object, no markdown, no explanation."
             )
 
-        return f"{base}{schema_instruction}{strict_instruction}\n\nTEXT:\n{text[:16000]}"
+        parts.append(f"\n\nTEXT:\n{text[:16000]}")
+        return "".join(parts)
 
-    def _ollama_chat(self, model: str, prompt: str, temperature: float = 0.0) -> str:
+    def _ollama_chat(
+        self, model: str, prompt: str, temperature: float = 0.0, timeout: int = 60
+    ) -> str:
         import ollama
 
         resp = ollama.chat(
@@ -84,7 +95,9 @@ class LLMExtractor:
         )
         return resp["message"]["content"]
 
-    def _parse_response(self, response: str, schema: dict | None, strict: bool = False) -> dict:
+    def _parse_response(
+        self, response: str, schema: dict | None, strict: bool = False
+    ) -> dict:
         if schema:
             try:
                 cleaned = self._clean_json(response)

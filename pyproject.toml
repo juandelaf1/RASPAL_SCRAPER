@@ -29,10 +29,8 @@ dependencies = [
 
 [project.optional-dependencies]
 fast = ["selectolax>=0.3.0"]
-all = ["raspal[fast]"]
-
-[project.scripts]
-raspal = "raspal.cli:app"
+dev = ["pytest>=8.0.0"]
+all = ["raspal[fast,dev]"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/raspal"]
@@ -48,3 +46,7 @@ select = ["E", "F", "I", "N", "W"]
 python_version = "3.11"
 strict = false
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
