@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "raspal"
+version = "0.1.0"
+description = "A reusable Python scraping toolkit — Scrapling + Playwright + LLM extraction via Ollama"
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "juandelaf1" }]
+keywords = ["scraping", "web-scraping", "crawling", "playwright", "scrapling", "llm", "ollama"]
+
+dependencies = [
+    "scrapling>=0.4.0",
+    "playwright>=1.40.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "httpx>=0.25.0",
+    "pydantic>=2.0.0",
+    "trafilatura>=1.6.0",
+    "ollama>=0.1.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+raspal = "raspal.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/raspal"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
