@@ -1,4 +1,5 @@
 import json
+
 from raspal.models import LLMConfig
 
 
@@ -16,7 +17,8 @@ class LLMExtractor:
         base = cfg.prompt or "Extract structured information from the following text."
         schema_instruction = ""
         if cfg.output_schema:
-            schema_instruction = f"\n\nReturn a JSON object with this schema:\n{json.dumps(cfg.output_schema, indent=2)}"
+            schema_str = json.dumps(cfg.output_schema, indent=2)
+            schema_instruction = f"\n\nReturn a JSON object with this schema:\n{schema_str}"
         return f"{base}{schema_instruction}\n\nTEXT:\n{text[:8000]}"
 
     def _ollama_chat(self, model: str, prompt: str) -> str:

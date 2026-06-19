@@ -3,7 +3,7 @@ from trafilatura import extract, extract_metadata
 
 class Extractor:
     def extract_text(self, html: str) -> str | None:
-        return extract(html, output_format="text", include_links=False, include_images=False)
+        return extract(html, output_format="txt", include_links=False, include_images=False)
 
     def extract_metadata(self, html: str) -> dict:
         meta = extract_metadata(html)

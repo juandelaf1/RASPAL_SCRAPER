@@ -1,9 +1,11 @@
 import json
+
 import typer
 from rich.console import Console
 from rich.json import JSON
-from raspal.fetcher import Fetcher
+
 from raspal.extractor import Extractor
+from raspal.fetcher import Fetcher
 from raspal.router import Router
 
 app = typer.Typer(name="raspal")

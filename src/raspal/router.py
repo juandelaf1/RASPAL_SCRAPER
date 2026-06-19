@@ -1,9 +1,11 @@
 from pathlib import Path
-from raspal.fetcher import Fetcher
-from raspal.extractor import Extractor
-from raspal.llm import LLMExtractor
-from raspal.models import PipelineConfig, LLMConfig
+
 import yaml
+
+from raspal.extractor import Extractor
+from raspal.fetcher import Fetcher
+from raspal.llm import LLMExtractor
+from raspal.models import PipelineConfig
 
 
 class Router:
@@ -18,7 +20,9 @@ class Router:
 
         config = PipelineConfig(**raw)
 
-        fetch_result = self.fetcher.fetch(config.url, engine=config.engine, cache_ttl=config.cache_ttl)
+        fetch_result = self.fetcher.fetch(
+            config.url, engine=config.engine, cache_ttl=config.cache_ttl
+        )
 
         result = {"url": config.url, "status": fetch_result.status, "cached": fetch_result.cached}
 
@@ -33,7 +37,8 @@ class Router:
                 fetch_result.html, config.extract.selectors
             )
 
-        if config.llm and result.get("text"):
-            result["llm_extraction"] = self.llm.extract(result["text"], config.llm)
+        text = result.get("text")
+        if config.llm and text:
+            result["llm_extraction"] = self.llm.extract(str(text), config.llm)
 
         return result

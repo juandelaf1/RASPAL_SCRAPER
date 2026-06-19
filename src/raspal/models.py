@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Any
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 class FetchResult(BaseModel):
@@ -23,7 +24,7 @@ class ExtractionConfig(BaseModel):
 class LLMConfig(BaseModel):
     model: str = "llama3.2"
     prompt: str = ""
-    output_schema: dict[str, Any] | None = Field(None, alias="schema")
+    output_schema: dict[str, Any] | None = None
 
 
 class PipelineConfig(BaseModel):

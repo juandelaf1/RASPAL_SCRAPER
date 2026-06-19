@@ -16,7 +16,10 @@ class Fetcher:
             if cached is not None:
                 return FetchResult(url=url, status=200, html=cached, cached=True, engine=engine)
 
-        result = self._fetch_scrapling(url) if engine == "scrapling" else self._fetch_playwright(url)
+        if engine == "scrapling":
+            result = self._fetch_scrapling(url)
+        else:
+            result = self._fetch_playwright(url)
 
         if self.cache and result.html:
             self.cache.set(url, result.html)
@@ -32,10 +35,11 @@ class Fetcher:
 
             f = ScraplingFetcher()
             resp = f.get(url)
+            html = resp.html_content or resp.body.decode() if hasattr(resp, "body") else None
             return FetchResult(
                 url=url,
                 status=resp.status,
-                html=resp.text,
+                html=html,
                 engine="scrapling",
                 metadata={"headers": dict(resp.headers)},
             )
