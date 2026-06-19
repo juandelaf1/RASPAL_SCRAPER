@@ -19,6 +19,7 @@ class ExtractionConfig(BaseModel):
     text: bool = True
     metadata: bool = True
     selectors: dict[str, str] = Field(default_factory=dict)
+    use_selectolax: bool = True
 
 
 class LLMConfig(BaseModel):
@@ -27,9 +28,16 @@ class LLMConfig(BaseModel):
     output_schema: dict[str, Any] | None = None
 
 
+class ThrottleConfig(BaseModel):
+    min_delay: float = 0.5
+    max_delay: float = 60.0
+    target_avg: float = 1.0
+
+
 class PipelineConfig(BaseModel):
     url: str
     engine: str = "auto"
     cache_ttl: int = 3600
     extract: ExtractionConfig = Field(default_factory=lambda: ExtractionConfig())
     llm: LLMConfig | None = None
+    throttle: ThrottleConfig | None = None

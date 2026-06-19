@@ -26,3 +26,16 @@ class Extractor:
             el = parser.css(selector)
             result[name] = el.text if el else None
         return result
+
+    def extract_selectors_fast(self, html: str, selectors: dict[str, str]) -> dict[str, str | None]:
+        try:
+            from selectolax.parser import HTMLParser
+
+            parser = HTMLParser(html)
+            result = {}
+            for name, selector in selectors.items():
+                node = parser.css_first(selector)
+                result[name] = node.text() if node else None
+            return result
+        except ImportError:
+            return self.extract_selectors(html, selectors)
