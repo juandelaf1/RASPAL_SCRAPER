@@ -1,43 +1,54 @@
 # **RΛSPΛL SCRAPER**
 
-> Scraping inteligente. Extracción potente. Sin servidores, sin nubes, sin límites.
+> De la URL al JSON estructurado. En tu máquina. Sin APIs de pago. Un solo comando.
 
-**RΛSPΛL SCRAPER** es un producto completo de web scraping potenciado por IA local. Combina **Scrapling**, **Playwright** y **Ollama** en un solo comando: fetch, extrae y estructura datos sin depender de servicios externos.
+**RΛSPΛL SCRAPER** es la única herramienta que te lleva desde una URL hasta datos estructurados listos para usar, todo en local, sin depender de servicios cloud ni APIs de terceros.
 
 ```bash
-pip install raspal
+pip install raspal && raspal setup
 raspal fetch https://ejemplo.com
+# → texto, metadata, todo listo
+
+raspal run config.yaml  
+# → extracción con IA via Ollama → JSON estructurado
 ```
 
 ---
 
-## Primeros pasos
+## ¿Para quién es?
 
-```bash
-# Prepara el entorno (browsers, Ollama)
-raspal setup
-
-# Crea un proyecto interactivo
-raspal init
-
-# ¡A scrapear!
-cd mi-proyecto
-raspal run config.yaml
-```
+- **Analistas de datos** que necesitan datos limpios sin escribir código complejo
+- **Ingenieros** que quieren scraper + IA en un solo pipeline
+- **Empresas** que no pueden enviar datos a servicios cloud por privacidad
 
 ---
 
 ## ¿Por qué RΛSPΛL SCRAPER?
 
-| Problema | Solución RΛSPΛL |
-|----------|----------------|
-| Páginas estáticas lentas | Scrapling con curl_cffi |
-| JavaScript pesado | Playwright headless con bloqueo de anuncios |
-| Cloudflare / Turnstile | Stealth bypass automático |
-| Datos no estructurados | LLM local con Ollama (privado, sin API keys) |
-| Rate limiting | AutoThrottle adaptativo |
-| Múltiples URLs | AsyncFetcher concurrente |
-| Repetir requests | Caché SQLite con TTL |
+| En lugar de... | Con RΛSPΛL SCRAPER |
+|----------------|-------------------|
+| Escribir Scrapy + BeautifulSoup + OpenAI por separado | **Un solo comando** |
+| Pagar $20/mes por Firecrawl o Apify | **Sin suscripciones, corre en tu máquina** |
+| Enviar datos a OpenAI para estructurarlos | **IA local con Ollama, cero fugas de datos** |
+| Que te baneen por scrapear agresivo | **Stealth + AutoThrottle, pareces un humano** |
+| Escribir scripts que solo funcionan en tu PC | **CLI portable, YAML configurable, dashboard web** |
+
+---
+
+## Comparativa
+
+| | RΛSPΛL SCRAPER | Scrapy | BeautifulSoup | Firecrawl |
+|---|---|---|---|---|
+| Fetch automático | ✅ 3 motores | ✅ 1 motor | ❌ | ✅ |
+| Anti-detección | ✅ Stealth + Throttle | ❌ | ❌ | ❌ |
+| IA local (Ollama) | ✅ | ❌ | ❌ | ❌ |
+| Sin enviar datos externos | ✅ | ✅ | ✅ | ❌ |
+| CLI completo | ✅ | ⚠️ | ❌ | ✅ |
+| Dashboard web | ✅ | ❌ | ❌ | ✅ |
+| Cola persistente | ✅ | ❌ | ❌ | ❌ |
+| Caché con TTL | ✅ | ❌ | ❌ | ❌ |
+| Precio | **Gratis** | Gratis | Gratis | Desde $20/mes |
+| Privacidad | **Total** | Total | Total | Tus datos van a su nube |
 
 ---
 
