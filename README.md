@@ -1,8 +1,8 @@
-# **RΛSPΛL**
+# **RΛSPΛL SCRAPER**
 
 > Scraping inteligente. Extracción potente. Sin servidores, sin nubes, sin límites.
 
-**RΛSPΛL** es un toolkit Python todo-en-uno para web scraping y extracción de datos potenciado por IA local. Combina **Scrapling**, **Playwright** y **Ollama** para ofrecerte un pipeline completo: fetch, extrae y estructura datos con un solo comando.
+**RΛSPΛL SCRAPER** es un producto completo de web scraping potenciado por IA local. Combina **Scrapling**, **Playwright** y **Ollama** en un solo comando: fetch, extrae y estructura datos sin depender de servicios externos.
 
 ```bash
 pip install raspal
@@ -11,7 +11,23 @@ raspal fetch https://ejemplo.com
 
 ---
 
-## ¿Por qué RΛSPΛL?
+## Primeros pasos
+
+```bash
+# Prepara el entorno (browsers, Ollama)
+raspal setup
+
+# Crea un proyecto interactivo
+raspal init
+
+# ¡A scrapear!
+cd mi-proyecto
+raspal run config.yaml
+```
+
+---
+
+## ¿Por qué RΛSPΛL SCRAPER?
 
 | Problema | Solución RΛSPΛL |
 |----------|----------------|
@@ -25,11 +41,17 @@ raspal fetch https://ejemplo.com
 
 ---
 
-## ⚡ Uso rápido
+## ⚡ Comandos
 
 ### CLI
 
 ```bash
+# Setup del entorno
+raspal setup                      # instala browsers, verifica Ollama
+
+# Crear proyecto
+raspal init                       # scaffold interactivo
+
 # Fetch básico
 raspal fetch https://ejemplo.com
 
@@ -48,6 +70,12 @@ raspal run config.yaml
 
 # Cola de URLs con prioridades
 raspal queue config.yaml --db queue.sqlite -o results.json
+
+# Reporte HTML
+raspal report --input results.json --output report.html
+
+# Dashboard web
+raspal serve                      # http://127.0.0.1:8462
 
 # Estado del throttle
 raspal status
@@ -196,12 +224,16 @@ pipeline.to_csv("resultados.csv")
 ## ⚙️ Instalación
 
 ```bash
-pip install raspal           # base
-pip install raspal[fast]     # + selectolax (CSS más rápido)
-pip install raspal[all]      # todo
+pip install raspal             # base
+pip install raspal[fast]       # + selectolax (CSS más rápido)
+pip install raspal[web]        # + dashboard web (FastAPI + Uvicorn)
+pip install raspal[all]        # todo
+
+# Preparar el entorno
+raspal setup                   # instala browsers, verifica Ollama
 ```
 
-Requiere Python ≥ 3.11 y [Ollama](https://ollama.com) para extracción con IA.
+Requiere Python ≥ 3.11 y [Ollama](https://ollama.com) para extracción con IA (setup lo verifica por ti).
 
 ---
 

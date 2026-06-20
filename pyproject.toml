@@ -29,11 +29,15 @@ dependencies = [
 
 [project.optional-dependencies]
 fast = ["selectolax>=0.3.0"]
+web = ["fastapi>=0.110.0", "uvicorn>=0.27.0"]
 dev = ["pytest>=8.0.0"]
-all = ["raspal[fast,dev]"]
+all = ["raspal[fast,web,dev]"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/raspal"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/raspal/web/templates" = "raspal/web/templates"
 
 [tool.ruff]
 line-length = 100

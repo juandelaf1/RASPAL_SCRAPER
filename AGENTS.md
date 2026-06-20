@@ -1,31 +1,47 @@
-# Raspal — Reference for AI Agents
+# RΛSPΛL SCRAPER — Reference for AI Agents
 
-Raspal is a Python scraping toolkit. Installed in this environment.
+RΛSPΛL SCRAPER is a production-grade web scraping product with local AI extraction. Installed in this environment.
 
 ## Install
 
 ```bash
-pip install raspal          # base
-pip install raspal[fast]    # + selectolax (faster CSS parsing)
-pip install raspal[all]     # everything
+pip install raspal              # base
+pip install raspal[fast]        # + selectolax (faster CSS parsing)
+pip install raspal[web]         # + web dashboard
+pip install raspal[all]         # everything
+
+raspal setup                    # install browsers, verify Ollama
 ```
 
 ## CLI
 
 ```bash
-# Fetch a URL
+# Setup
+raspal setup                    # prepare environment
+raspal init                     # scaffold project
+
+# Fetch
 raspal fetch https://ejemplo.com
 raspal fetch https://ejemplo.com --engine playwright
 raspal fetch https://ejemplo.com --engine stealth
 
-# Run YAML pipeline
+# Async
+raspal async_fetch https://ejemplo.com
+raspal async_batch https://ejemplo.com https://httpbin.org/json
+
+# Pipeline
 raspal run config.yaml
 
-# Process a URL queue
+# Queue
 raspal queue config.yaml --db queue.sqlite -o results.json
 
-# Show throttle status
+# Reports & Dashboard
+raspal report --input results.json --output report.html
+raspal serve                    # http://localhost:8462
+
+# Status
 raspal status
+raspal clear_cache
 ```
 
 ## Engines

@@ -2,6 +2,7 @@ import asyncio
 import json
 import signal
 import sys
+from pathlib import Path
 
 import typer
 from rich.console import Console
@@ -192,6 +193,49 @@ def clear_cache(
         else:
             cache.clear()
             console.print("[green]Cleared entire cache[/green]")
+
+
+@app.command()
+def setup():
+    """Prepare the environment: install browsers, check Ollama."""
+    from raspal.setup import run_setup
+    run_setup()
+
+
+@app.command()
+def serve(
+    host: str = typer.Option("127.0.0.1", "--host", help="Host del dashboard"),
+    port: int = typer.Option(8462, "--port", "-p", help="Puerto del dashboard"),
+):
+    """Start the web dashboard."""
+    from raspal.web.dashboard import serve as web_serve
+    web_serve(host=host, port=port)
+
+
+@app.command()
+def init():
+    """Scaffold a new scraping project interactively."""
+    from raspal.scaffold import run_init
+    run_init()
+
+
+@app.command()
+def report(
+    input: str = typer.Option("results.json", "--input", "-i", help="Pipeline results JSON"),
+    output: str = typer.Option("report.html", "--output", "-o", help="HTML report path"),
+):
+    """Generate an HTML report from pipeline results."""
+    from raspal.reporter import generate_html, print_summary
+
+    try:
+        with open(input, encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        console.print(f"[red]No se encontró {input}[/red]")
+        raise typer.Exit(1)
+
+    print_summary(data)
+    generate_html(data, output)
 
 
 if __name__ == "__main__":
