@@ -1,10 +1,12 @@
 from pathlib import Path
 
+import asyncio
 import yaml
 
 from raspal.exceptions import ConfigError, RaspalError
 from raspal.extractor import Extractor
 from raspal.fetcher import Fetcher
+from raspal.improvements.async_compatibility import AsyncFetcher
 from raspal.llm import LLMExtractor
 from raspal.models import PipelineConfig
 from raspal.pipeline import Pipeline
@@ -101,6 +103,79 @@ class Router:
                 result["llm_chain_error"] = str(e)
 
         return result
+
+    async def run_async(self, config_path: str | Path) -> dict:
+        """Async version of run for use in async contexts (FastAPI, etc.) using AsyncFetcher."""
+        config = self._load_config(config_path)
+        self._apply_config(config)
+
+        # Use AsyncFetcher for true async Playwright isolation
+        async_fetcher = AsyncFetcher(
+            throttle=self.throttle,
+            proxy=config.proxy,
+        )
+
+        try:
+            fetch_result = await async_fetcher.fetch_async(
+                config.url,
+                engine=config.engine,
+                cache_ttl=config.cache_ttl,
+                timeout=config.timeout,
+            )
+
+            result = {
+                "url": config.url,
+                "status": fetch_result.status,
+                "engine": fetch_result.engine,
+                "cached": fetch_result.cached,
+            }
+
+            if fetch_result.error:
+                result["error"] = fetch_result.error
+                return result
+
+            if config.extract.text and fetch_result.html:
+                try:
+                    result["text"] = self.extractor.extract_text(fetch_result.html)
+                except Exception as e:
+                    result["text_error"] = str(e)
+
+            if config.extract.metadata and fetch_result.html:
+                try:
+                    result["metadata"] = self.extractor.extract_metadata(fetch_result.html)
+                except Exception as e:
+                    result["metadata_error"] = str(e)
+
+            if config.extract.selectors and fetch_result.html:
+                try:
+                    if config.extract.use_selectolax:
+                        result["selectors"] = self.extractor.extract_selectors_fast(
+                            fetch_result.html, config.extract.selectors
+                        )
+                    else:
+                        result["selectors"] = self.extractor.extract_selectors(
+                            fetch_result.html, config.extract.selectors
+                        )
+                except Exception as e:
+                    result["selectors_error"] = str(e)
+
+            text = result.get("text")
+            text_str = str(text) if text else ""
+            if config.llm and text_str:
+                try:
+                    result["llm_extraction"] = self.llm.extract(text_str, config.llm)
+                except Exception as e:
+                    result["llm_extraction_error"] = str(e)
+
+            if config.llm_chain and text_str:
+                try:
+                    result["llm_chain"] = self.llm.extract_chain(text_str, config.llm_chain)
+                except Exception as e:
+                    result["llm_chain_error"] = str(e)
+
+            return result
+        finally:
+            await async_fetcher.close()
 
     def run_queue(
         self,

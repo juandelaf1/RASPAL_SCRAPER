@@ -1,3 +1,4 @@
+import asyncio
 import json
 import signal
 import sys
@@ -10,6 +11,7 @@ from rich.table import Table
 from raspal.cache import Cache
 from raspal.extractor import Extractor
 from raspal.fetcher import Fetcher
+from raspal.improvements.async_compatibility import AsyncFetcher
 from raspal.router import Router
 
 app = typer.Typer(name="raspal")
@@ -100,6 +102,82 @@ def status():
         table.add_row(engine, f"{delay:.2f}")
 
     console.print(table)
+
+
+@app.command()
+def async_fetch(
+    url: str,
+    engine: str = typer.Option("auto", "--engine", "-e", help="scrapling | playwright | stealth | auto"),
+    text: bool = typer.Option(True, "--text", "-t", help="Extract text content"),
+    timeout: int = typer.Option(30, "--timeout", help="Request timeout in seconds"),
+    pretty: bool = typer.Option(True, "--pretty", "-p", help="Pretty print output"),
+):
+    """Fetch a URL asynchronously."""
+    async def run():
+        async with AsyncFetcher() as fetcher:
+            result = await fetcher.fetch_async(url, engine=engine, timeout=timeout)
+
+            output = {
+                "url": url,
+                "status": result.status,
+                "engine": result.engine,
+                "cached": result.cached,
+            }
+
+            if result.error:
+                output["error"] = result.error
+            elif text and result.html:
+                ext = Extractor()
+                output["text"] = ext.extract_text(result.html)
+                output["metadata"] = ext.extract_metadata(result.html)
+
+            return output
+
+    try:
+        output = asyncio.run(run())
+        if pretty:
+            console.print(JSON(json.dumps(output, indent=2, default=str)))
+        else:
+            console.print(json.dumps(output, indent=2, default=str))
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@app.command()
+async def async_batch(
+    urls: list[str] = typer.Argument(..., help="List of URLs to fetch asynchronously"),
+    engine: str = typer.Option("auto", "--engine", "-e", help="scrapling | playwright | stealth | auto"),
+    text: bool = typer.Option(True, "--text", "-t", help="Extract text content"),
+    timeout: int = typer.Option(30, "--timeout", help="Request timeout in seconds"),
+    pretty: bool = typer.Option(True, "--pretty", "-p", help="Pretty print output"),
+):
+    """Fetch multiple URLs asynchronously."""
+    async with AsyncFetcher() as fetcher:
+        results = await fetcher.fetch_batch(urls, engine=engine, timeout=timeout)
+
+        output = []
+        for result in results:
+            entry = {
+                "url": getattr(result, "url", "unknown"),
+                "status": getattr(result, "status", 0),
+                "engine": getattr(result, "engine", "unknown"),
+                "cached": getattr(result, "cached", False),
+            }
+
+            if hasattr(result, "error") and result.error:
+                entry["error"] = result.error
+            elif text and hasattr(result, "html") and result.html:
+                ext = Extractor()
+                entry["text"] = ext.extract_text(result.html)
+                entry["metadata"] = ext.extract_metadata(result.html)
+
+            output.append(entry)
+
+        if pretty:
+            console.print(JSON(json.dumps(output, indent=2, default=str)))
+        else:
+            console.print(json.dumps(output, indent=2, default=str))
 
 
 @app.command()
