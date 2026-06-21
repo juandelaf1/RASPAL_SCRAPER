@@ -1,8 +1,8 @@
-# **RΛSPΛL SCRAPER**
+# **RASPAL SCRAPER**
 
-> Web scraping con IA local. Scrapling + Playwright + Ollama.
+> Scraping + IA local. Sin API keys. Sin salir de tu maquina.
 
-**RΛSPΛL SCRAPER** es un toolkit de web scraping que combina múltiples motores de fetch con extracción de datos vía IA local (Ollama), todo desde la línea de comandos o como librería Python.
+**RASPAL SCRAPER** extrae datos estructurados de cualquier web usando IA local. Sin enviar datos a terceros. Sin pagar APIs de terceros. Un solo comando.
 
 ```bash
 # Recomendado: Docker (todo incluido)

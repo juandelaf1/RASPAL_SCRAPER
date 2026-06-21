@@ -1,30 +1,76 @@
 # Examples
 
-Pipelines YAML de ejemplo para casos de uso reales.
+Pipelines YAML de ejemplo para casos de uso reales (10 plantillas).
 
-## E-commerce
+## Comercio electronico
 
 ```bash
 raspal run examples/ecommerce-products.yaml
 ```
+Extrae productos, precios, disponibilidad y descripcion.
 
-Extrae productos, precios, disponibilidad y descripción. Usa IA local para estructurar los datos en JSON.
+## Precios competitivos
+
+```bash
+raspal run examples/competitor-pricing.yaml
+```
+Monitorea precios, descuentos y valoraciones de la competencia.
+
+## Resenas de productos
+
+```bash
+raspal run examples/product-reviews.yaml
+```
+Extrae resenas con analisis de sentimiento (positivo/negativo/neutral).
 
 ## Noticias
 
 ```bash
 raspal run examples/news-article.yaml
 ```
+Scrapea articulos de noticias (titulo, autor, fecha, resumen, puntos clave).
 
-Scrapea artículos de noticias y extrae título, autor, fecha, resumen y puntos clave.
+## Ofertas de empleo
+
+```bash
+raspal run examples/job-scraper.yaml
+```
+Extrae ofertas de trabajo: titulo, empresa, ubicacion, salario y requisitos.
+
+## Investigacion academica
+
+```bash
+raspal run examples/academic-research.yaml
+```
+Extrae papers, autores, resumenes, palabras clave y citas.
 
 ## Inmobiliaria
 
 ```bash
 raspal run examples/real-estate-listings.yaml
 ```
+Listados inmobiliarios con precio, ubicacion, habitaciones y metros.
 
-Extrae listados inmobiliarios con precio, ubicación, habitaciones, baños y metros cuadrados.
+## Criptomonedas
+
+```bash
+raspal run examples/crypto-prices.yaml
+```
+Precios, cambios 24h, capitalizacion y volumen de criptomonedas.
+
+## Directorio de empresas
+
+```bash
+raspal run examples/business-directory.yaml
+```
+Datos de contacto de directorios publicos: nombre, direccion, telefono, email.
+
+## LinkedIn (perfiles publicos)
+
+```bash
+raspal run examples/linkedin-company.yaml
+```
+Informacion publica de empresa. **Respeta terminos de uso.**
 
 ---
 

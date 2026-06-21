@@ -1,0 +1,30 @@
+# Product Reviews: extraccion de resenas y sentimiento con IA
+# Uso: raspal run examples/product-reviews.yaml
+
+url: "https://example.com/product/reviews"
+engine: playwright
+cache_ttl: 7200
+timeout: 60
+
+extract:
+  text: true
+  metadata: true
+  use_selectolax: false
+  selectors:
+    review_title: "h3.review-title"
+    review_body: "div.review-text"
+    rating: "span.review-rating"
+    author: "span.review-author"
+    date: "time.review-date"
+
+llm:
+  model: "llama3.2:3b"
+  prompt: "Extrae cada resena del producto: titulo, texto completo, puntuacion numerica, autor, fecha y clasifica el sentimiento como positivo/negativo/neutral. Devuelve un array de resenas como JSON valido"
+  output_schema:
+    reviews:
+      title: ""
+      text: ""
+      rating: 0
+      author: ""
+      date: ""
+      sentiment: ""

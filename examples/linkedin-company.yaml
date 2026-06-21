@@ -1,0 +1,31 @@
+# LinkedIn: perfil publico de empresa (cumple con terminos de uso)
+# Solo extrae informacion publica visible sin autenticacion
+# ADVERTENCIA: Revisa los terminos de uso de LinkedIn antes de scraping
+# Uso: raspal run examples/linkedin-company.yaml
+
+url: "https://www.linkedin.com/company/example"
+engine: stealth
+cache_ttl: 86400
+timeout: 60
+
+extract:
+  text: true
+  metadata: true
+  use_selectolax: false
+  selectors:
+    company_name: "h1.company-name"
+    tagline: "p.tagline"
+    about: "section.about-us p"
+    industry: "dd.industry"
+    employees: "dd.employee-count"
+
+llm:
+  model: "llama3.2:3b"
+  prompt: "Extrae informacion publica de la empresa: nombre, descripcion breve, industria, tamano aproximado, ubicacion y sitio web como JSON valido"
+  output_schema:
+    company_name: ""
+    description: ""
+    industry: ""
+    company_size: ""
+    location: ""
+    website: ""

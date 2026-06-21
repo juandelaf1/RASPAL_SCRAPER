@@ -1,0 +1,30 @@
+# Academic Research: papers, abstracts y citas
+# Uso: raspal run examples/academic-research.yaml
+
+url: "https://example.com/research/papers"
+engine: scrapling
+cache_ttl: 86400
+timeout: 30
+
+extract:
+  text: true
+  metadata: true
+  use_selectolax: true
+  selectors:
+    paper_title: "h2.paper-title"
+    authors: "span.authors"
+    abstract: "div.abstract"
+    keywords: "div.keywords"
+    citation_count: "span.citations"
+
+llm:
+  model: "llama3.2:3b"
+  prompt: "Extrae informacion de los articulos academicos: titulo del paper, autores, resumen, palabras clave y numero de citas como JSON valido"
+  output_schema:
+    papers:
+      title: ""
+      authors: ""
+      abstract: ""
+      keywords: ""
+      citations: 0
+      year: 0

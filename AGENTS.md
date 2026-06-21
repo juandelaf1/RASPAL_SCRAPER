@@ -1,6 +1,6 @@
-# RΛSPΛL SCRAPER — Reference for AI Agents
+# RASPAL SCRAPER — Reference for AI Agents
 
-RΛSPΛL SCRAPER is a production-grade web scraping product with local AI extraction and compliance checks. Installed in this environment.
+RASPAL SCRAPER is a production-grade web scraping product with local AI extraction and compliance checks. Installed in this environment.
 
 ## Install
 
@@ -20,15 +20,17 @@ pip install raspal[all]         # everything
 raspal setup                    # install browsers, verify Ollama
 ```
 
-## CLI
+## CLI (15 commands)
 
 ```bash
 # Setup
 raspal setup                    # prepare environment
 raspal init                     # scaffold project
+raspal version                  # show version
 
 # Compliance
 raspal compliance https://ejemplo.com  # robots.txt, sensitive domain check
+raspal validate config.yaml     # validate YAML pipeline
 
 # Fetch
 raspal fetch https://ejemplo.com
@@ -36,8 +38,8 @@ raspal fetch https://ejemplo.com --engine playwright
 raspal fetch https://ejemplo.com --engine stealth
 
 # Async
-raspal async_fetch https://ejemplo.com
-raspal async_batch https://ejemplo.com https://httpbin.org/json
+raspal async-fetch https://ejemplo.com
+raspal async-batch https://ejemplo.com https://httpbin.org/json
 
 # Pipeline
 raspal run config.yaml
@@ -51,7 +53,10 @@ raspal serve                    # http://localhost:8462
 
 # Status
 raspal status
-raspal clear_cache
+raspal clear-cache
+
+# Demo
+raspal demo                     # scrape httpbin/html, show preview
 ```
 
 ## Legal & Ethical Use
@@ -159,7 +164,7 @@ llm:
   template: "product"
   prompt: "Extract product name, price, and availability as JSON"
 
-# Or multi-step chain:
+# Multi-step chain:
 # llm_chain:
 #   - name: classify
 #     prompt: "Classify this page: product, article, or review?"
@@ -173,3 +178,17 @@ throttle:
 ```
 
 Run: `raspal run config.yaml`
+
+## Fase 3 — Documentation Status
+
+| File | Status |
+|------|--------|
+| docs/quickstart-docker.md | Done |
+| docs/legal-and-ethics.md | Done |
+| docs/brand-identity.md | Done |
+| docs/reddit-post.md | Done |
+| docs/getting-started.md | Done |
+| docs/configuration.md | Done |
+| docs/engines.md | Done |
+| docs/cli-reference.md | Done |
+| docs/troubleshooting.md | Done |

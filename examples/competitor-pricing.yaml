@@ -1,0 +1,31 @@
+# Competitor Pricing: monitoreo de precios de la competencia
+# Uso: raspal run examples/competitor-pricing.yaml
+
+url: "https://example.com/competitor-pricing"
+engine: stealth
+cache_ttl: 1800
+timeout: 45
+
+extract:
+  text: true
+  metadata: true
+  use_selectolax: true
+  selectors:
+    product_name: "h2.product-name"
+    price: "span.price-value"
+    original_price: "span.original-price"
+    discount: "span.discount-badge"
+    rating: "div.rating-stars"
+
+llm:
+  model: "llama3.2:3b"
+  template: "product"
+  prompt: "Extrae informacion de precios competitivos: nombre del producto, precio actual, precio original, descuento porcentual, valoracion y disponibilidad como JSON valido"
+  output_schema:
+    product_name: ""
+    current_price: 0.0
+    original_price: 0.0
+    discount_percent: 0
+    currency: ""
+    rating: 0.0
+    in_stock: false

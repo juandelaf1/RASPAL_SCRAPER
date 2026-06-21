@@ -1,0 +1,31 @@
+# Job Scraper: extraccion de ofertas de empleo
+# Uso: raspal run examples/job-scraper.yaml
+
+url: "https://example.com/jobs"
+engine: auto
+cache_ttl: 3600
+timeout: 30
+
+extract:
+  text: true
+  metadata: true
+  use_selectolax: true
+  selectors:
+    job_title: "h2.job-title"
+    company: "span.company-name"
+    location: "span.job-location"
+    salary: "span.salary-range"
+    description: "div.job-description"
+
+llm:
+  model: "llama3.2:3b"
+  template: "generic"
+  prompt: "Extrae las ofertas de empleo de la pagina: titulo del puesto, empresa, ubicacion, rango salarial, tipo de contrato y requisitos principales como JSON valido"
+  output_schema:
+    jobs:
+      title: ""
+      company: ""
+      location: ""
+      salary_range: ""
+      contract_type: ""
+      requirements: ""

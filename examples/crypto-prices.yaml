@@ -1,0 +1,31 @@
+# Crypto Prices: precios de criptomonedas de fuentes publicas
+# Uso: raspal run examples/crypto-prices.yaml
+
+url: "https://example.com/crypto/prices"
+engine: scrapling
+cache_ttl: 300
+timeout: 20
+
+extract:
+  text: true
+  metadata: true
+  use_selectolax: true
+  selectors:
+    coin_name: "td.coin-name"
+    price: "td.price-usd"
+    change_24h: "td.change-24h"
+    market_cap: "td.market-cap"
+    volume: "td.volume-24h"
+
+llm:
+  model: "llama3.2:3b"
+  template: "generic"
+  prompt: "Extrae los datos de criptomonedas: nombre, simbolo, precio USD, cambio en 24h, capitalizacion de mercado y volumen como JSON valido"
+  output_schema:
+    coins:
+      name: ""
+      symbol: ""
+      price_usd: 0.0
+      change_24h_percent: 0.0
+      market_cap: ""
+      volume_24h: ""

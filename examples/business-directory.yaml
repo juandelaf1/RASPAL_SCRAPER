@@ -1,0 +1,31 @@
+# Business Directory: datos de contacto de directorios publicos
+# Uso: raspal run examples/business-directory.yaml
+
+url: "https://example.com/directory"
+engine: auto
+cache_ttl: 43200
+timeout: 30
+
+extract:
+  text: true
+  metadata: true
+  use_selectolax: true
+  selectors:
+    business_name: "h3.business-name"
+    address: "p.address"
+    phone: "span.phone"
+    email: "a.email"
+    website: "a.website"
+    category: "span.category"
+
+llm:
+  model: "llama3.2:3b"
+  prompt: "Extrae la informacion de contacto de empresas del directorio: nombre, direccion, telefono, email, sitio web y categoria como JSON valido"
+  output_schema:
+    businesses:
+      name: ""
+      address: ""
+      phone: ""
+      email: ""
+      website: ""
+      category: ""
