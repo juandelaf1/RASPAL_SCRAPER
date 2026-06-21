@@ -19,7 +19,7 @@ except ImportError:
     JSONResponse = None
     uvicorn = None
 
-app = FastAPI(title="RΛSPΛL SCRAPER Dashboard")
+app = FastAPI(title="RASPAL SCRAPER Dashboard")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -30,7 +30,7 @@ async def index():
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RΛSPΛL SCRAPER — Dashboard</title>
+<title>RASPAL SCRAPER — Dashboard</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; }
@@ -55,7 +55,7 @@ async def index():
 </style>
 </head>
 <body>
-  <h1>RΛSPΛL SCRAPER</h1>
+  <h1>RASPAL SCRAPER</h1>
   <div class="grid" id="stats"></div>
   <div class="card">
     <h2>Ejecutar scraper</h2>

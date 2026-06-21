@@ -27,11 +27,11 @@ def _step(msg: str):
 
 
 def _ok(msg: str):
-    console.print(f"  [green]├[/green] [bold green]✓[/bold green] {msg}")
+    console.print(f"  [green]├[/green] [bold green]v[/bold green] {msg}")
 
 
 def _fail(msg: str):
-    console.print(f"  [red]├[/red] [bold red]✗[/bold red] {msg}")
+    console.print(f"  [red]├[/red] [bold red]x[/bold red] {msg}")
 
 
 def _skip(msg: str):
@@ -129,7 +129,7 @@ def _pull_ollama_model(model: str):
 
 def run_setup():
     console.print(Panel.fit(
-        "[bold]RΛSPΛL SCRAPER[/bold] — Setup\n"
+        "[bold]RASPAL SCRAPER[/bold] — Setup\n"
         "Vamos a preparar tu entorno para scraping con IA local.\n"
         "Esto instalará los browsers necesarios y configurará Ollama.",
         box=box.ROUNDED,
@@ -175,6 +175,6 @@ def run_setup():
         _fail("playwright no instalado")
 
     console.print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    console.print("[bold green]✓ Setup completado[/bold green]")
+    console.print("[bold green]v Setup completado[/bold green]")
     console.print("  Prueba con: [bold]raspal fetch https://example.com[/bold]")
     console.print("  Con IA:    [bold]raspal run config.yaml[/bold]")

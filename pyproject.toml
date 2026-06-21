@@ -33,6 +33,9 @@ web = ["fastapi>=0.110.0", "uvicorn>=0.27.0"]
 dev = ["pytest>=8.0.0"]
 all = ["raspal[fast,web,dev]"]
 
+[project.scripts]
+raspal = "raspal.cli:app"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/raspal"]
 

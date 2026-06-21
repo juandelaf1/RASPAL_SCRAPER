@@ -49,7 +49,7 @@ def generate_html(pipeline_data: list[dict], output: str | Path):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RΛSPΛL SCRAPER — Reporte</title>
+<title>RASPAL SCRAPER — Reporte</title>
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
   body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; padding: 2rem; }}
@@ -72,7 +72,7 @@ def generate_html(pipeline_data: list[dict], output: str | Path):
 </style>
 </head>
 <body>
-    <h1>RΛSPΛL SCRAPER</h1>
+    <h1>RASPAL SCRAPER</h1>
     <div class="meta">Reporte generado el {timestamp} | {len(items)} items procesados</div>
     <table>
         <thead>

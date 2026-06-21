@@ -11,7 +11,7 @@ console = Console()
 
 def run_init():
     console.print(Panel.fit(
-        "[bold]RΛSPΛL SCRAPER[/bold] — Init\n"
+        "[bold]RASPAL SCRAPER[/bold] — Init\n"
         "Crea un proyecto de scraping configurado.",
         box=box.ROUNDED,
     ))
@@ -109,7 +109,7 @@ def run_init():
     with open(readme_file, "w", encoding="utf-8") as f:
         f.write(f"""# {project_dir}
 
-Scraper generado con RΛSPΛL SCRAPER.
+Scraper generado con RASPAL SCRAPER.
 
 ## Uso
 
@@ -123,7 +123,7 @@ raspal queue config.yaml --db queue.sqlite -o results/results.json
 """)
 
     console.print("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    console.print("[bold green]✓ Proyecto creado[/bold green]")
+    console.print("[bold green]v Proyecto creado[/bold green]")
     console.print(f"  [bold]{project_path}[/bold]")
     console.print(f"  ├── [bold]config.yaml[/bold]")
     console.print(f"  ├── [bold]results/[/bold]")

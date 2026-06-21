@@ -146,7 +146,7 @@ def async_fetch(
 
 
 @app.command()
-async def async_batch(
+def async_batch(
     urls: list[str] = typer.Argument(..., help="List of URLs to fetch asynchronously"),
     engine: str = typer.Option("auto", "--engine", "-e", help="scrapling | playwright | stealth | auto"),
     text: bool = typer.Option(True, "--text", "-t", help="Extract text content"),
@@ -154,31 +154,39 @@ async def async_batch(
     pretty: bool = typer.Option(True, "--pretty", "-p", help="Pretty print output"),
 ):
     """Fetch multiple URLs asynchronously."""
-    async with AsyncFetcher() as fetcher:
-        results = await fetcher.fetch_batch(urls, engine=engine, timeout=timeout)
+    async def run():
+        async with AsyncFetcher() as fetcher:
+            results = await fetcher.fetch_batch(urls, engine=engine, timeout=timeout)
 
-        output = []
-        for result in results:
-            entry = {
-                "url": getattr(result, "url", "unknown"),
-                "status": getattr(result, "status", 0),
-                "engine": getattr(result, "engine", "unknown"),
-                "cached": getattr(result, "cached", False),
-            }
+            output = []
+            for result in results:
+                entry = {
+                    "url": getattr(result, "url", "unknown"),
+                    "status": getattr(result, "status", 0),
+                    "engine": getattr(result, "engine", "unknown"),
+                    "cached": getattr(result, "cached", False),
+                }
 
-            if hasattr(result, "error") and result.error:
-                entry["error"] = result.error
-            elif text and hasattr(result, "html") and result.html:
-                ext = Extractor()
-                entry["text"] = ext.extract_text(result.html)
-                entry["metadata"] = ext.extract_metadata(result.html)
+                if hasattr(result, "error") and result.error:
+                    entry["error"] = result.error
+                elif text and hasattr(result, "html") and result.html:
+                    ext = Extractor()
+                    entry["text"] = ext.extract_text(result.html)
+                    entry["metadata"] = ext.extract_metadata(result.html)
 
-            output.append(entry)
+                output.append(entry)
 
+            return output
+
+    try:
+        output = asyncio.run(run())
         if pretty:
             console.print(JSON(json.dumps(output, indent=2, default=str)))
         else:
             console.print(json.dumps(output, indent=2, default=str))
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
 
 
 @app.command()
@@ -206,9 +214,9 @@ def validate(
     try:
         router = Router()
         router._load_config(config)
-        console.print(f"[green]✓ Config válido:[/green] {config}")
+        console.print(f"[green]v Config válido:[/green] {config}")
     except ConfigError as e:
-        console.print(f"[red]✗ Config inválido:[/red] {e}")
+        console.print(f"[red]x Config inválido:[/red] {e}")
         raise typer.Exit(1)
 
 
@@ -234,7 +242,7 @@ def compliance(
         for warning in warnings:
             console.print(f"  • {warning}")
     else:
-        console.print("\n[green]✓ Sin advertencias obvias. Aun así, revisa ToS y robots.txt.[/green]")
+        console.print("\n[green]v Sin advertencias obvias. Aun así, revisa ToS y robots.txt.[/green]")
 
 
 @app.command()
@@ -278,6 +286,68 @@ def report(
 
     print_summary(data)
     generate_html(data, output)
+
+
+@app.command()
+def demo(
+    pretty: bool = typer.Option(True, "--pretty", "-p", help="Pretty print output"),
+):
+    """Run a quick demo scraping a public URL."""
+    import time
+    from rich.panel import Panel
+
+    DEMO_URL = "http://example.com"
+
+    start = time.time()
+    console.print(Panel.fit(
+        "[bold]RASPAL SCRAPER — Demo[/bold]\n"
+        f"Scraping [cyan]{DEMO_URL}[/cyan]...",
+    ))
+
+    with Fetcher() as fetcher:
+        result = fetcher.fetch(DEMO_URL, engine="auto", timeout=15)
+
+    elapsed = time.time() - start
+
+    output = {
+        "url": DEMO_URL,
+        "status": result.status,
+        "engine": result.engine,
+        "cached": result.cached,
+        "time_seconds": round(elapsed, 2),
+    }
+
+    if result.error:
+        output["error"] = result.error
+        console.print(f"[red]Error: {result.error}[/red]")
+    elif result.html:
+        ext = Extractor()
+        output["text_preview"] = ext.extract_text(result.html)[:500]
+        output["metadata"] = ext.extract_metadata(result.html)
+
+    if pretty:
+        console.print(JSON(json.dumps(output, indent=2, default=str)))
+    else:
+        console.print(json.dumps(output, indent=2, default=str))
+
+    console.print("\n[bold green]v Demo completado[/bold green]")
+    console.print(f"  Tiempo: [bold]{elapsed:.2f}s[/bold] | Motor: [bold]{result.engine}[/bold]")
+    console.print("\n[bold]Siguientes pasos:[/bold]")
+    console.print("  1. [bold]raspal init[/bold] — Crea tu propio proyecto")
+    console.print("  2. [bold]raspal fetch <url>[/bold] — Prueba con cualquier URL")
+    console.print("  3. [bold]raspal run config.yaml[/bold] — Ejecuta un pipeline YAML")
+
+
+@app.command()
+def version():
+    """Show the installed version."""
+    from importlib.metadata import version as get_version
+    try:
+        ver = get_version("raspal")
+    except Exception:
+        ver = "unknown"
+    console.print(f"RASPAL SCRAPER v{ver}")
+    console.print("Web scraping toolkit with local LLM extraction via Ollama.")
 
 
 if __name__ == "__main__":
