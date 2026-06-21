@@ -73,6 +73,9 @@ raspal async_fetch https://ejemplo.com
 # Múltiples URLs en paralelo
 raspal async_batch https://ejemplo.com https://httpbin.org/json
 
+# Validación de config
+raspal validate config.yaml          # verifica que el YAML es correcto
+
 # Pipeline desde YAML
 raspal run config.yaml
 
@@ -199,6 +202,21 @@ Procesa cientos de URLs en paralelo con aislamiento por proceso para Playwright.
 | `playwright` | Playwright | JS pesado, SPAs |
 | `stealth` | Playwright + anti-detect | Cloudflare, Turnstile |
 | `auto` | — | Selección automática |
+
+---
+
+## 📂 Ejemplos
+
+Pipelines YAML listos para usar:
+
+```bash
+raspal run examples/ecommerce-products.yaml    # Extraer productos de e-commerce
+raspal run examples/news-article.yaml          # Scraping de noticias con resumen IA
+raspal run examples/real-estate-listings.yaml  # Listados inmobiliarios
+```
+
+Cada ejemplo incluye selectores CSS y configuración de extracción con IA.
+Ver [`examples/README.md`](examples/README.md).
 
 ---
 
