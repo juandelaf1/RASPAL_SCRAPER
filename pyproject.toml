@@ -39,9 +39,6 @@ raspal = "raspal.cli:app"
 [tool.hatch.build.targets.wheel]
 packages = ["src/raspal"]
 
-[tool.hatch.build.targets.wheel.force-include]
-"src/raspal/web/templates" = "raspal/web/templates"
-
 [tool.ruff]
 line-length = 100
 target-version = "py311"
