@@ -16,9 +16,11 @@
   <img src="https://img.shields.io/badge/async-ready-1f8acb?logo=asyncio&logoColor=white" alt="Async">
 </p>
 
-> Scraping + IA local. Sin API keys. Sin salir de tu maquina.
+> Scraping + local AI. No API keys. No data leaving your machine.
+> Español • [English](#english)
 
 **RASPAL SCRAPER** extrae datos estructurados de cualquier web usando IA local. Sin enviar datos a terceros. Sin pagar APIs de terceros. Un solo comando.
+Extract structured data from any website using local AI. No third-party APIs. One command.
 
 ```bash
 # Recomendado: Docker (todo incluido)
@@ -327,3 +329,26 @@ MIT — haz lo que quieras.
 ## Versionado
 
 RASPAL usa [SemVer](https://semver.org/). La API pública documentada en [`PUBLIC_API.md`](PUBLIC_API.md) no cambia de forma incompatible en versiones MINOR o PATCH.
+
+---
+
+<h2 id="english">🇬🇧 English</h2>
+
+<p align="center">
+  <b>RASPAL SCRAPER</b> — Extract structured data from any website using local AI.
+</p>
+
+- No API keys required
+- No data leaves your machine
+- 3 engines: scrapling (fast), playwright (JS), stealth (anti-bot)
+- Local AI extraction via Ollama
+- Docker + docker-compose ready
+- YAML pipelines, queue, cache, throttle
+- MIT licensed
+
+```bash
+docker compose up -d
+docker compose run raspal raspal run config.yaml
+```
+
+See [`docs/`](docs/) for full documentation in English.
