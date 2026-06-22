@@ -5,6 +5,7 @@
 </p>
 
 <p align="center">
+  <img src="https://github.com/juandelaf1/RASPAL_SCRAPER/actions/workflows/ci.yml/badge.svg" alt="CI">
   <img src="https://img.shields.io/badge/python-3.11%2B-3776AB?logo=python&logoColor=white" alt="Python 3.11+">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
   <img src="https://img.shields.io/badge/ollama-local-8A2BE2?logo=ollama&logoColor=white" alt="Ollama">

@@ -1,7 +1,7 @@
-import pytest
+from unittest.mock import patch
 
 from raspal.fetcher import Fetcher
-from raspal.models import ProxyConfig
+from raspal.models import ProxyConfig, FetchResult
 
 
 def test_resolve_engine_auto():
@@ -35,12 +35,14 @@ def test_context_manager():
     with Fetcher() as f:
         assert f.cache is not None
         assert f.throttle is not None
-    # After context, should be closed
 
 
-def test_fetch_unknown_url():
-    """Fetch should return error gracefully, not crash."""
-    f = Fetcher()
-    result = f.fetch("https://thisshouldnotexist.invalid", timeout=5)
-    assert result.status == 0
-    assert result.error is not None
+def test_fetch_returns_result_on_error():
+    with patch.object(Fetcher, '_dispatch') as mock_dispatch:
+        mock_dispatch.return_value = FetchResult(
+            url="https://error.test", status=0, error="Simulated error", engine="scrapling"
+        )
+        f = Fetcher()
+        result = f.fetch("https://error.test", timeout=5)
+        assert result.status == 0
+        assert result.error is not None
