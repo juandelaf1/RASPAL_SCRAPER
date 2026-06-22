@@ -1,7 +1,7 @@
 # **RASPAL SCRAPER**
 
 <p align="center">
-  <img src="assets/raspal_scrapper_banner.png" alt="RASPAL SCRAPER Banner" width="100%">
+  <img src="https://raw.githubusercontent.com/juandelaf1/RASPAL_SCRAPER/master/assets/raspal_scrapper_banner.png" alt="RASPAL SCRAPER Banner" width="100%">
 </p>
 
 <p align="center">
