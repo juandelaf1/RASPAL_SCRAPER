@@ -1,0 +1,61 @@
+site_name: RASPAL SCRAPER
+site_description: Scraping + IA local. Sin API keys. Sin salir de tu maquina.
+site_url: https://juandelaf1.github.io/RASPAL_SCRAPER/
+repo_url: https://github.com/juandelaf1/RASPAL_SCRAPER
+repo_name: juandelaf1/RASPAL_SCRAPER
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  language: es
+  logo: assets/raspal_scrapper_banner.png
+  favicon: assets/raspal_scrapper_banner.png
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Modo oscuro
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - search.suggest
+    - content.code.copy
+
+nav:
+  - Inicio: index.md
+  - Primeros pasos: getting-started.md
+  - Inicio rápido Docker: quickstart-docker.md
+  - CLI Referencia: cli-reference.md
+  - Motores: engines.md
+  - Configuración: configuration.md
+  - Legal y Ética: legal-and-ethics.md
+  - Troubleshooting: troubleshooting.md
+  - Identidad de Marca: brand-identity.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.tasklist
+  - pymdownx.details
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/juandelaf1/RASPAL_SCRAPER
+  generator: false
+
+copyright: MIT License — haz lo que quieras

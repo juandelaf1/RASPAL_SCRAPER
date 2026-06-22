@@ -1,0 +1,38 @@
+name: Integration Tests
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"  # every Monday at 6am UTC
+  workflow_dispatch:
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      ollama:
+        image: ollama/ollama:latest
+        ports:
+          - 11434:11434
+        volumes:
+          - ollama_data:/root/.ollama
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pip install pytest pytest-asyncio
+      - name: Pull LLM model
+        run: |
+          sleep 10
+          curl -X POST http://localhost:11434/api/pull -d '{"name": "llama3.2:3b"}'
+        timeout-minutes: 10
+      - name: Install Playwright browsers
+        run: |
+          pip install playwright
+          playwright install chromium
+      - name: Run integration tests
+        run: pytest tests/ -v --tb=short -k "integration"
+        env:
+          OLLAMA_HOST: http://localhost:11434
+        timeout-minutes: 10

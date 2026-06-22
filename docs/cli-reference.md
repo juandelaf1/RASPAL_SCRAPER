@@ -27,6 +27,9 @@ Ejecuta con cola de persistencia SQLite.
 ### `raspal compliance <url>`
 Verifica robots.txt y dominio sensible.
 
+### `raspal doctor`
+Diagnostico del sistema: Python, Ollama, Playwright, permisos.
+
 ### `raspal validate <config.yaml>`
 Valida sintaxis de pipeline YAML.
 
@@ -50,8 +53,11 @@ Inicia dashboard web en http://localhost:8462.
 ### `raspal clear-cache`
 Limpia cache de fetch.
 
+### `raspal doctor`
+Diagnostico completo del sistema: Python, Ollama, Playwright, permisos.
+
 ### `raspal demo`
-Scrapea httpbin.org/html como demostracion.
+Scrapea books.toscrape.com como demostracion con selectores CSS reales.
 
 ### `raspal version`
 Muestra la version instalada.
