@@ -1,5 +1,6 @@
 import asyncio
 import json
+import shutil
 import signal
 import sys
 from pathlib import Path
@@ -13,6 +14,7 @@ from raspal.cache import Cache
 from raspal.extractor import Extractor
 from raspal.fetcher import Fetcher
 from raspal.improvements.async_compatibility import AsyncFetcher
+from raspal.llm import LLMExtractor
 from raspal.router import Router
 
 app = typer.Typer(name="raspal")
@@ -272,6 +274,71 @@ def compliance(
 
 
 @app.command()
+def doctor():
+    """Verify that the RASPAL environment is correctly configured."""
+    import shutil
+    import sys
+
+    console.print("\n[bold]🩺 RASPAL Doctor[/bold]\n")
+    all_ok = True
+
+    py_ver = sys.version_info
+    if py_ver >= (3, 11):
+        console.print(f"  ✅ Python {py_ver.major}.{py_ver.minor}.{py_ver.micro}")
+    else:
+        console.print(f"  ❌ Python {py_ver.major}.{py_ver.minor} — se necesita Python ≥ 3.11")
+        all_ok = False
+
+    ollama_bin = shutil.which("ollama")
+    if ollama_bin:
+        console.print(f"  ✅ Ollama instalado ({ollama_bin})")
+        try:
+            import httpx
+            r = httpx.get("http://localhost:11434/api/tags", timeout=3)
+            models = r.json().get("models", [])
+            if models:
+                console.print(f"  ✅ Ollama activo — {len(models)} modelo(s)")
+                for m in models[:3]:
+                    console.print(f"     • {m.get('name', 'unknown')}")
+            else:
+                console.print("  ⚠️  Ollama activo sin modelos. Ejecuta: ollama pull llama3.2:3b")
+        except Exception:
+            console.print("  ⚠️  Ollama instalado pero no corriendo. Ejecuta: ollama serve")
+            all_ok = False
+    else:
+        console.print("  ❌ Ollama no encontrado — instálalo en https://ollama.com")
+        all_ok = False
+
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            try:
+                browser = p.chromium.launch(headless=True)
+                browser.close()
+                console.print("  ✅ Playwright browsers instalados")
+            except Exception:
+                console.print("  ⚠️  Playwright sin browsers. Ejecuta: raspal setup")
+    except ImportError:
+        console.print("  ❌ Playwright no instalado. Ejecuta: pip install raspal[all]")
+
+    from raspal.cache import Cache
+    import os
+    if os.access(".", os.W_OK):
+        console.print("  ✅ Permisos de escritura en directorio actual")
+    else:
+        console.print("  ❌ Sin permisos de escritura")
+        all_ok = False
+
+    console.print()
+    if all_ok:
+        console.print("[bold green]✅ RASPAL está listo.[/bold green]")
+        console.print("   Siguiente paso: [bold]raspal demo[/bold]\n")
+    else:
+        console.print("[bold yellow]⚠️  RASPAL tiene problemas de configuración.[/bold yellow]")
+        console.print("   Revisa los puntos marcados con ❌ arriba.\n")
+
+
+@app.command()
 def setup():
     """Prepare the environment: install browsers, check Ollama."""
     from raspal.setup import run_setup
@@ -318,50 +385,69 @@ def report(
 def demo(
     pretty: bool = typer.Option(True, "--pretty", "-p", help="Pretty print output"),
 ):
-    """Run a quick demo scraping a public URL."""
+    """Run a demo with data from the web. No configuration needed."""
     import time
-    from rich.panel import Panel
 
-    DEMO_URL = "http://example.com"
+    DEMO_URL = "https://books.toscrape.com"
 
+    console.print("\n[bold cyan]🔍 RASPAL DEMO[/bold cyan]")
+    console.print("─" * 50)
+
+    console.print(f"\n[bold]1. Fetching[/bold] {DEMO_URL}...")
     start = time.time()
-    console.print(Panel.fit(
-        "[bold]RASPAL SCRAPER — Demo[/bold]\n"
-        f"Scraping [cyan]{DEMO_URL}[/cyan]...",
-    ))
+    try:
+        with Fetcher() as fetcher:
+            result = fetcher.fetch(DEMO_URL, engine="scrapling")
+        fetch_time = time.time() - start
+        console.print(f"   ✅ {result.status} OK en {fetch_time:.1f}s (motor: scrapling)")
+    except Exception as e:
+        console.print(f"   ❌ Error de fetch: {e}")
+        console.print("   Verifica tu conexión y ejecuta [bold]raspal doctor[/bold]")
+        raise typer.Exit(1)
 
-    with Fetcher() as fetcher:
-        result = fetcher.fetch(DEMO_URL, engine="auto", timeout=15)
+    console.print("\n[bold]2. Extrayendo contenido...[/bold]")
+    ext = Extractor()
+    data = ext.extract_selectors(result.html, {
+        "titles": "article.product_pod h3 a",
+        "prices": "article.product_pod p.price_color",
+    })
+    titles = data.get("titles", [])
+    prices = data.get("prices", [])
+    console.print(f"   ✅ {len(titles)} productos detectados")
+    for t, p in list(zip(titles, prices))[:5]:
+        console.print(f"     • {t} — {p}")
 
-    elapsed = time.time() - start
+    import shutil
+    ai_result = None
+    if shutil.which("ollama"):
+        console.print("\n[bold]3. Estructurando con IA local (Ollama)...[/bold]")
+        try:
+            llm = LLMExtractor()
+            text_sample = ext.extract_text(result.html)[:1500]
+            ai_result = llm.extract(text_sample, template="product")
+            console.print("   ✅ Extracción con IA completada")
+        except Exception as e:
+            console.print(f"   ⚠️  IA no disponible ({e})")
+    else:
+        console.print("\n[bold]3. IA local[/bold] ⚠️  Ollama no detectado")
+        console.print("   Instala Ollama en https://ollama.com para activarlo")
 
+    total_time = time.time() - start
+    console.print(f"\n[bold]📦 Resultado:[/bold]")
     output = {
         "url": DEMO_URL,
-        "status": result.status,
-        "engine": result.engine,
-        "cached": result.cached,
-        "time_seconds": round(elapsed, 2),
+        "products_found": len(titles),
+        "sample": [{"title": t, "price": p} for t, p in list(zip(titles, prices))[:5]],
+        "ai_extraction": ai_result,
     }
-
-    if result.error:
-        output["error"] = result.error
-        console.print(f"[red]Error: {result.error}[/red]")
-    elif result.html:
-        ext = Extractor()
-        output["text_preview"] = ext.extract_text(result.html)[:500]
-        output["metadata"] = ext.extract_metadata(result.html)
-
     if pretty:
-        console.print(JSON(json.dumps(output, indent=2, default=str)))
+        console.print(JSON(json.dumps(output, indent=2, ensure_ascii=False, default=str)))
     else:
-        console.print(json.dumps(output, indent=2, default=str))
+        console.print(json.dumps(output, indent=2, ensure_ascii=False, default=str))
 
-    console.print("\n[bold green]v Demo completado[/bold green]")
-    console.print(f"  Tiempo: [bold]{elapsed:.2f}s[/bold] | Motor: [bold]{result.engine}[/bold]")
-    console.print("\n[bold]Siguientes pasos:[/bold]")
-    console.print("  1. [bold]raspal init[/bold] — Crea tu propio proyecto")
-    console.print("  2. [bold]raspal fetch <url>[/bold] — Prueba con cualquier URL")
-    console.print("  3. [bold]raspal run config.yaml[/bold] — Ejecuta un pipeline YAML")
+    console.print(f"\n[dim]⏱  Total: {total_time:.1f}s | Sin API keys | Datos en tu máquina[/dim]")
+    console.print("\n[bold]Siguiente paso:[/bold] raspal fetch <tu-url> --engine auto")
+    console.print("[bold]Docs:[/bold] https://github.com/juandelaf1/RASPAL_SCRAPER\n")
 
 
 @app.command()
