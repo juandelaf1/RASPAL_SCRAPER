@@ -1,5 +1,9 @@
 # **RASPAL SCRAPER**
 
+<p align="center">
+  <img src="assets/raspal_banner.png" alt="RASPAL SCRAPER Banner" width="800">
+</p>
+
 > Scraping + IA local. Sin API keys. Sin salir de tu maquina.
 
 **RASPAL SCRAPER** extrae datos estructurados de cualquier web usando IA local. Sin enviar datos a terceros. Sin pagar APIs de terceros. Un solo comando.
