@@ -1,34 +1,19 @@
-"""
-Legal and ethical compliance helpers for RASPAL SCRAPER.
-
-This module provides utilities to help users make informed decisions about
-their scraping activities. It does not make legal determinations.
-"""
-
 from __future__ import annotations
 
 import json
 from pathlib import Path
 from urllib.parse import urlparse
+from urllib.robotparser import RobotFileParser
 
 
 class ComplianceChecker:
-    """Check basic compliance signals before scraping."""
+    """Check compliance signals with real robots.txt parsing."""
 
-    def __init__(self, user_agent: str = "RASPAL-SCRAPER/0.4.0 (+https://github.com/juandelaf1/RASPAL_SCRAPER)"):
+    def __init__(self, user_agent: str = "RASPAL-SCRAPER/0.6.0 (+https://github.com/juandelaf1/RASPAL_SCRAPER)"):
         self.user_agent = user_agent
+        self._robots_cache: dict[str, RobotFileParser] = {}
 
     def check_url(self, url: str) -> dict:
-        """Return compliance signals for a URL.
-
-        This checks:
-        - robots.txt presence and rules
-        - URL structure validity
-        - Whether the domain appears to be a sensitive target
-
-        Returns:
-            dict with compliance signals and warnings
-        """
         parsed = urlparse(url)
         if not parsed.scheme or not parsed.netloc:
             return {
@@ -42,6 +27,8 @@ class ComplianceChecker:
             "url": url,
             "domain": parsed.netloc,
             "robots_txt": None,
+            "can_fetch": None,
+            "crawl_delay": None,
             "is_sensitive_domain": self._is_sensitive_domain(parsed.netloc),
         }
 
@@ -53,12 +40,49 @@ class ComplianceChecker:
 
         robots_url = f"{parsed.scheme}://{parsed.netloc}/robots.txt"
         signals["robots_txt"] = robots_url
-        warnings.append(f"Consulta {robots_url} antes de scrapear")
+
+        allowed, reason = self.can_fetch(url)
+        signals["can_fetch"] = allowed
+        if allowed:
+            warnings.append(f"✅ {robots_url} permite scraping para '{self.user_agent}'")
+        else:
+            warnings.append(f"❌ {robots_url} bloquea scraping para '{self.user_agent}'")
+
+        delay = self.get_crawl_delay(url)
+        if delay is not None:
+            signals["crawl_delay"] = delay
+            warnings.append(f"⏱  Crawl-delay: {delay}s — respeta este intervalo")
 
         return {"signals": signals, "warnings": warnings}
 
+    def can_fetch(self, url: str) -> tuple[bool, str]:
+        parsed = urlparse(url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+        robots_url = f"{base_url}/robots.txt"
+
+        if base_url not in self._robots_cache:
+            rp = RobotFileParser()
+            rp.set_url(robots_url)
+            try:
+                rp.read()
+                self._robots_cache[base_url] = rp
+            except Exception:
+                return True, f"No se pudo leer {robots_url} — procediendo con precaución"
+
+        rp = self._robots_cache[base_url]
+        allowed = rp.can_fetch(self.user_agent, url)
+        if allowed:
+            return True, f"{url} permite scraping según robots.txt"
+        return False, f"{url} está bloqueado en robots.txt para '{self.user_agent}'"
+
+    def get_crawl_delay(self, url: str) -> float | None:
+        parsed = urlparse(url)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+        if base_url in self._robots_cache:
+            return self._robots_cache[base_url].crawl_delay(self.user_agent)
+        return None
+
     def _is_sensitive_domain(self, domain: str) -> bool:
-        """Check if domain appears to be a sensitive target."""
         sensitive_patterns = [
             "facebook.com",
             "linkedin.com",
@@ -82,7 +106,6 @@ def check_compliance(url: str) -> dict:
 
 
 def load_config(config_path: str | Path) -> dict:
-    """Load a YAML config and return compliance-relevant metadata."""
     import yaml
 
     with open(config_path, "r", encoding="utf-8") as f:

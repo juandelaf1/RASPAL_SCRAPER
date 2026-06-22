@@ -238,25 +238,37 @@ def validate(
 def compliance(
     url: str = typer.Argument(..., help="URL a verificar"),
 ):
-    """Check basic compliance signals before scraping."""
-    from raspal.compliance import check_compliance
+    """Check robots.txt compliance before scraping."""
+    from raspal.compliance import ComplianceChecker
 
-    result = check_compliance(url)
+    checker = ComplianceChecker()
+    result = checker.check_url(url)
     signals = result.get("signals", {})
     warnings = result.get("warnings", [])
 
+    console.print(f"[bold]URL:[/bold] {url}")
     console.print(f"[bold]Dominio:[/bold] {signals.get('domain', 'N/A')}")
     console.print(f"[bold]robots.txt:[/bold] {signals.get('robots_txt', 'N/A')}")
+    can_fetch = signals.get("can_fetch")
+    if can_fetch is True:
+        console.print(f"[bold]Scraping permitido:[/bold] [green]Sí[/green]")
+    elif can_fetch is False:
+        console.print(f"[bold]Scraping permitido:[/bold] [red]No (bloqueado por robots.txt)[/red]")
+    else:
+        console.print(f"[bold]Scraping permitido:[/bold] [yellow]No se pudo verificar[/yellow]")
+    delay = signals.get("crawl_delay")
+    if delay is not None:
+        console.print(f"[bold]Crawl-delay:[/bold] {delay}s")
 
     if signals.get("is_sensitive_domain"):
         console.print("[yellow]⚠️  Dominio potencialmente sensible (redes sociales, salud, finanzas)[/yellow]")
 
     if warnings:
         console.print("\n[yellow]Advertencias:[/yellow]")
-        for warning in warnings:
-            console.print(f"  • {warning}")
+        for w in warnings:
+            console.print(f"  • {w}")
     else:
-        console.print("\n[green]v Sin advertencias obvias. Aun así, revisa ToS y robots.txt.[/green]")
+        console.print("\n[green]✔ Sin advertencias.[/green]")
 
 
 @app.command()
