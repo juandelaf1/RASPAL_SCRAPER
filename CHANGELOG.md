@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.6.0] — 2026-06-22
+
+### Added
+- `raspal doctor` — full environment diagnostics
+- `raspal demo` — demo with books.toscrape.com + optional AI
+- CI workflow (pytest + ruff on every push)
+- `PUBLIC_API.md` — stable public API contract
+- `CONTRIBUTING.md` — contribution guidelines
+- `SECURITY.md` — security policy
+- Tests: CLI, Compliance, Async modules (+13 new tests)
+- CI badges in README
+
+### Changed
+- Compliance checker now parses real robots.txt (urllib.robotparser)
+- Router refactored: `_extract()` eliminates ~70% code duplication
+- Versioning policy documented (SemVer)
+- All tests use mocks — no external dependencies needed
+
+### Fixed
+- `test_fetch_unknown_url` no longer makes real HTTP requests
+
 ## [0.5.0] — 2026-06-21
 
 ### Added

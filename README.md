@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/ollama-local-8A2BE2?logo=ollama&logoColor=white" alt="Ollama">
   <img src="https://img.shields.io/badge/playwright-ready-45ba4b?logo=playwright&logoColor=white" alt="Playwright">
   <img src="https://img.shields.io/badge/docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker">
-  <img src="https://img.shields.io/badge/version-0.5.0-blue" alt="Version 0.5.0">
+  <img src="https://img.shields.io/badge/version-0.6.0-blue" alt="Version 0.6.0">
   <img src="https://img.shields.io/badge/coverage-SQLite-orange?logo=sqlite&logoColor=white" alt="SQLite">
   <img src="https://img.shields.io/badge/async-ready-1f8acb?logo=asyncio&logoColor=white" alt="Async">
 </p>
