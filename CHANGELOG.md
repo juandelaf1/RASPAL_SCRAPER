@@ -7,9 +7,26 @@
 - CLI examples use hyphens (`async-fetch`, `clear-cache`) instead of underscores
 - Added missing `raspal doctor` and `raspal version` to README
 
+### Added
+- Docs site config (`mkdocs.yml`) with Material theme, bilingual
+- `docs/index.md` — landing page for mkdocs site
+- `docs/product-hunt.md` — Product Hunt launch draft
+- `docs/hacker-news.md` — Hacker News Show HN draft
+- `docs/reddit-post.md` — Reddit drafts (EN + ES)
+- `.github/workflows/integration.yml` — weekly integration tests with real Ollama/Playwright
+- `.github/workflows/docs.yml` — GitHub Pages deploy for mkdocs
+- README link to docs site
+
 ### Changed
 - pyproject.toml version bumped to 0.6.1
 - Trusted publishing configured on PyPI for CI/CD automation
+- AGENTS.md fully updated with v0.6.1 state
+- `docs/cli-reference.md` — added `raspal doctor`
+
+### Fixed
+- README banner uses absolute raw URL so PyPI renders it correctly
+- CLI examples use hyphens (`async-fetch`, `clear-cache`) instead of underscores
+- Added missing `raspal doctor` and `raspal version` to README
 
 ## [0.6.0] — 2026-06-22
 

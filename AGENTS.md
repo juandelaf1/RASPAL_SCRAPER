@@ -1,6 +1,8 @@
 # RASPAL SCRAPER — Reference for AI Agents
 
-RASPAL SCRAPER is a production-grade web scraping product with local AI extraction and compliance checks. Installed in this environment.
+RASPAL SCRAPER v0.6.1 is a production-grade web scraping tool with local AI extraction.
+PyPI: `pip install raspal` | GitHub: `juandelaf1/RASPAL_SCRAPER`
+Docs site: `https://juandelaf1.github.io/RASPAL_SCRAPER/` (pending GitHub Pages activation)
 
 ## Install
 
@@ -16,20 +18,20 @@ pip install raspal              # base
 pip install raspal[fast]        # + selectolax (faster CSS parsing)
 pip install raspal[web]         # + web dashboard
 pip install raspal[all]         # everything
-
 raspal setup                    # install browsers, verify Ollama
 ```
 
-## CLI (15 commands)
+## CLI (17 commands)
 
 ```bash
 # Setup
-raspal setup                    # prepare environment
+raspal setup                    # install browsers, verify Ollama
 raspal init                     # scaffold project
+raspal doctor                   # system diagnostics (Python, Ollama, Playwright)
 raspal version                  # show version
 
 # Compliance
-raspal compliance https://ejemplo.com  # robots.txt, sensitive domain check
+raspal compliance https://ejemplo.com  # real robots.txt parsing
 raspal validate config.yaml     # validate YAML pipeline
 
 # Fetch
@@ -56,23 +58,28 @@ raspal status
 raspal clear-cache
 
 # Demo
-raspal demo                     # scrape httpbin/html, show preview
+raspal demo                     # scrape books.toscrape.com with real CSS selectors
 ```
 
-## Legal & Ethical Use
+## CI/CD (4 workflows)
 
-- Always check robots.txt before scraping
-- Read Terms of Service
-- Respect rate limits
-- Don't scrape personal data without legal basis
-- Don't bypass authentication or paywalls
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| `ci.yml` | push/PR to master | pytest (3.11 + 3.12), ruff lint+format |
+| `publish.yml` | tag `v*` | tests → build → PyPI (trusted publishing) |
+| `docker-publish.yml` | tag `v*` | tests → build → Docker Hub (`juandelaf/raspal`) |
+| `integration.yml` | weekly Mon / manual | Ollama service + Playwright + real HTTP tests |
+| `docs.yml` | push master / manual | mkdocs build → deploy to GitHub Pages |
 
-See `docs/legal-and-ethics.md` for details.
+## Trusted Publishing
+
+Configured on PyPI: `juandelaf1/RASPAL_SCRAPER` + `publish.yml`.
+Next `v*` tag publishes automatically — no token needed.
 
 ## Engines
 
-| Engine | Scrapling class | When to use |
-|--------|----------------|-------------|
+| Engine | Class | When to use |
+|--------|-------|-------------|
 | `scrapling` | `Fetcher` | Static HTML, curl_cffi fast requests |
 | `playwright` | `DynamicFetcher` | JS-rendered, blocks ads/resources |
 | `stealth` | `StealthyFetcher` | Cloudflare/Turnstile, anti-bot pages |
@@ -84,69 +91,47 @@ See `docs/legal-and-ethics.md` for details.
 from raspal import Fetcher, Cache, Extractor, LLMExtractor
 from raspal import AutoThrottle, RequestQueue, Pipeline
 
-# === FETCH ===
 f = Fetcher()
 result = f.fetch("https://example.com", engine="auto", cache_ttl=3600)
-# result.html, result.text, result.status, result.cached, result.engine
 
-# === EXTRACT ===
 ext = Extractor()
 text = ext.extract_text(result.html)
 meta = ext.extract_metadata(result.html)
 data = ext.extract_selectors(html, {"title": "h1", "price": ".price"})
-data = ext.extract_selectors_fast(html, {"title": "h1"})  # uses selectolax
+data = ext.extract_selectors_fast(html, {"title": "h1"})
 
-# === LLM EXTRACTION (Ollama) ===
 from raspal.models import LLMConfig, ChainStep
 llm = LLMExtractor()
-data = llm.extract(text, LLMConfig(model="llama3.2", prompt="Extract product name and price"))
-
-# Built-in templates: product, article, person, review, event
 data = llm.extract(text, LLMConfig(template="product"))
-
-# Structured JSON extraction with schema validation
-schema = {"name": "", "price": "", "rating": 0}
-data = llm.extract(text, LLMConfig(output_schema=schema, strict=True))
-
-# Multi-step chain: classify -> extract details
-chain = [
-    ChainStep(name="classify", prompt="Is this page about a product or an article? Reply with just 'product' or 'article'."),
-    ChainStep(name="details", prompt="Extract the main information from this content.",
-              output_schema={"title": "", "description": ""}),
-]
-result = llm.extract_chain(text, chain)
-
-# Batch extraction
+data = llm.extract(text, LLMConfig(output_schema={"name": "", "price": ""}, strict=True))
+result = llm.extract_chain(text, [
+    ChainStep(name="classify", prompt="Product or article?"),
+    ChainStep(name="details", prompt="Extract info",
+              output_schema={"title": "", "price": ""}),
+])
 results = llm.extract_batch([text1, text2], LLMConfig(template="article"))
 
-# === CACHE ===
-cache = Cache("my_cache.sqlite")
+cache = Cache("cache.sqlite")
 cache.get(url, ttl=3600)
 cache.set(url, html)
 
-# === AUTOTHROTTLE ===
 t = AutoThrottle(min_delay=0.5, max_delay=60.0)
-t.wait("scrapling")   # blocks if needed
-t.record("scrapling", 200)  # auto-adjusts delay
-t.record("scrapling", 429)  # doubles delay on rate limit
+t.wait("scrapling")
+t.record("scrapling", 200)
 
-# === REQUEST QUEUE ===
 q = RequestQueue("queue.sqlite")
-q.push("https://example.com/page1", priority=1)
-q.push("https://example.com/page2", priority=2)
-item = q.pop()           # returns highest-priority item
-q.complete(item)         # marks done
-q.retry(item, "timeout") # retries up to max_retries
-q.pending_count()
+q.push("https://example.com", priority=1)
+q.pop()
+q.complete(item)
+q.retry(item, "timeout")
 
-# === PIPELINE (collect results) ===
 p = Pipeline()
 p.add(url="https://x.com", data={"title": "Example"})
 p.to_json("results.json")
 p.to_csv("results.csv")
 ```
 
-## YAML Pipeline (`config.yaml`)
+## YAML Pipeline
 
 ```yaml
 url: "https://ejemplo.com/productos"
@@ -155,7 +140,6 @@ cache_ttl: 3600
 extract:
   text: true
   metadata: true
-  use_selectolax: true
   selectors:
     title: "h1.product-title"
     price: "span.price"
@@ -163,32 +147,26 @@ llm:
   model: "llama3.2"
   template: "product"
   prompt: "Extract product name, price, and availability as JSON"
-
-# Multi-step chain:
-# llm_chain:
-#   - name: classify
-#     prompt: "Classify this page: product, article, or review?"
-#     output_schema: {"category": ""}
-#   - name: extract
-#     prompt: "Extract key information"
-#     output_schema: {"title": "", "price": ""}
 throttle:
   min_delay: 0.5
   max_delay: 60.0
 ```
 
-Run: `raspal run config.yaml`
+## Project Status
 
-## Fase 3 — Documentation Status
+### PyPI versions published
+`0.1.0` → `0.2.0` → `0.3.0` → `0.4.0` → **`0.6.0`** → **`0.6.1`** (latest)
 
-| File | Status |
-|------|--------|
-| docs/quickstart-docker.md | Done |
-| docs/legal-and-ethics.md | Done |
-| docs/brand-identity.md | Done |
-| docs/reddit-post.md | Done |
-| docs/getting-started.md | Done |
-| docs/configuration.md | Done |
-| docs/engines.md | Done |
-| docs/cli-reference.md | Done |
-| docs/troubleshooting.md | Done |
+### What exists
+- 6-phase blindaje complete (tests, CI/CD, router refactor, compliance, doctor/demo, docs)
+- 81 unit tests (no external deps needed)
+- Trusted publishing + Docker Hub publishing
+- mkdocs site config (Material theme, bilingual)
+- Promotion drafts: Reddit (EN+ES), Product Hunt, Hacker News
+- Full doc set: index, getting-started, quickstart-docker, cli-reference, engines, configuration, legal-and-ethics, troubleshooting, brand-identity, reddit-post, product-hunt, hacker-news
+
+### Next steps
+1. Activate GitHub Pages (Settings → Pages → "GitHub Actions")
+2. Publish promotion drafts: Reddit → HN → Product Hunt
+3. Iterate on feedback, plan v0.7.0 features
+4. Add integration tests if community contributions grow
