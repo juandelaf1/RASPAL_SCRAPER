@@ -357,4 +357,4 @@ docker compose up -d
 docker compose run raspal raspal run config.yaml
 ```
 
-See [`docs/`](docs/) for full documentation in English.
+See [`docs/`](docs/) or the [docs site](https://juandelaf1.github.io/RASPAL_SCRAPER/) for full documentation in English.
