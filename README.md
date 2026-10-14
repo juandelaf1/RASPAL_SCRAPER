@@ -358,3 +358,5 @@ docker compose run raspal raspal run config.yaml
 ```
 
 See [`docs/`](docs/) or the [docs site](https://juandelaf1.github.io/RASPAL_SCRAPER/) for full documentation in English.
+
+Read the [case study](https://juandelaf1.github.io/projects/raspal-scraper) on the portfolio for architecture decisions, trade-offs, and verified results.
