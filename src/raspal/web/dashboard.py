@@ -65,8 +65,8 @@ async def index():
 
 @app.get("/api/stats")
 async def stats():
-    router = Router()
-    cache = Cache()
+    Router()
+    Cache()
     return {
         "Cache activa": "✅",
         "Ollama": "✅" if _check_ollama() else "❌",

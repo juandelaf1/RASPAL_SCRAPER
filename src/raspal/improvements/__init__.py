@@ -1,5 +1,17 @@
 from raspal.cache import Cache
-from raspal.exceptions import *
+from raspal.exceptions import (
+    CacheError,
+    ConfigError,
+    ConnectionError,
+    ExtractError,
+    FetchError,
+    HTTPError,
+    LLMError,
+    ProxyError,
+    QueueError,
+    RaspalError,
+    TimeoutError,
+)
 from raspal.extractor import Extractor
 from raspal.fetcher import Fetcher
 from raspal.improvements.async_compatibility import AsyncFetcher
